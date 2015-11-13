@@ -1,7 +1,9 @@
 --------------------------------------------------------------------------------
-{-# LANGUAGE GADTs                #-}
-{-# LANGUAGE OverloadedStrings    #-}
-{-# LANGUAGE ExtendedDefaultRules #-}
+{-# LANGUAGE
+    OverloadedStrings
+  , ExtendedDefaultRules
+  #-}
+
 module Text.Digestive.Lucid.Html5
     ( inputText
     , inputTextArea
@@ -23,10 +25,8 @@ module Text.Digestive.Lucid.Html5
 --------------------------------------------------------------------------------
 import           Control.Monad               (forM_, when)
 import           Data.Maybe                  (fromMaybe)
-import           Data.Monoid                 (mappend, mempty)
 import           Data.Text                   (Text, pack)
 import           Lucid
-import           Lucid.Base
 
 --------------------------------------------------------------------------------
 import           Text.Digestive.View
@@ -59,7 +59,7 @@ inputTextArea :: ( Monad m
 inputTextArea r c ref view = textarea_
     ([ id_     ref'
      , name_   ref'
-     ] ++ (rows' r) ++ (cols' c)) $
+     ] ++ rows' r ++ cols' c) $
         toHtmlRaw $ fieldInputText ref view
   where
     ref'          = absoluteRef ref view
@@ -99,7 +99,7 @@ inputSelect ref view = select_
     [ id_   ref'
     , name_ ref'
     ] $ forM_ choices $ \(i, c, sel) -> option_
-          ([value_ (value i)] ++ (ifSingleton sel $ selected_ "selected")) c
+          (value_ (value i) : ifSingleton sel (selected_ "selected")) c
   where
     ref'    = absoluteRef ref view
     value i = ref' `mappend` "." `mappend` i
@@ -115,7 +115,7 @@ inputRadio :: ( Monad m
 inputRadio brs ref view = forM_ choices $ \(i, c, sel) -> do
     let val = value i
     input_ $ [type_ "radio", value_ val, id_ val, name_ ref']
-               ++ (ifSingleton sel checked_)
+               ++ ifSingleton sel checked_
     label_ [for_ val] c
     when brs (br_ [])
   where
@@ -130,7 +130,7 @@ inputCheckbox ref view = input_ $
     [ type_ "checkbox"
     , id_   ref'
     , name_ ref'
-    ] ++ (ifSingleton selected checked_)
+    ] ++ ifSingleton selected checked_
   where
     ref'     = absoluteRef ref view
     selected = fieldInputBool ref view
@@ -159,9 +159,9 @@ inputSubmit value = input_
 
 --------------------------------------------------------------------------------
 label :: Monad m => Text -> View v -> HtmlT m () -> HtmlT m ()
-label ref view value = label_
+label ref view = label_
     [ for_ ref'
-    ] $ value
+    ]
   where
     ref' = absoluteRef ref view
 
