@@ -2,7 +2,7 @@ Name:          digestive-functors-lucid
 Version:       0.0.0.3
 Synopsis:      Lucid frontend for the digestive-functors library
 Description:   Ludic frontend for the digestive-functors library
-Homepage:      http://github.com/jaspervdj/digestive-functors
+Homepage:      https://github.com/athanclark/digestive-functors-lucid
 License:       BSD3
 License-file:  LICENSE
 Author:        Athan Clark <athan.clark@gmail.com>
