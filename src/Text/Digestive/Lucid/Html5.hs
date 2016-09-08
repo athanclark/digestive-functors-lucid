@@ -24,7 +24,6 @@ module Text.Digestive.Lucid.Html5
 
 --------------------------------------------------------------------------------
 import           Control.Monad               (forM_, when)
-import           Data.Maybe                  (fromMaybe)
 import           Data.Text                   (Text, pack)
 import           Lucid
 
@@ -142,11 +141,9 @@ inputFile ref view = input_
     [ type_  "file"
     , id_    ref'
     , name_  ref'
-    , value_ $ pack value
     ]
   where
     ref'  = absoluteRef ref view
-    value = fromMaybe "" $ fieldInputFile ref view
 
 
 --------------------------------------------------------------------------------
