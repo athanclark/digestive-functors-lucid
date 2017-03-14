@@ -145,10 +145,11 @@ inputRadio brs ref view = forM_ choices $ \(i, c, sel) -> do
 
 --------------------------------------------------------------------------------
 inputCheckbox :: Monad m => Text -> View (HtmlT m ()) -> HtmlT m ()
-inputCheckbox ref view = inputWithType "checkbox"
-    (ifSingleton selected checked_)
-    ref
-    view
+inputCheckbox ref view = input_ $
+    [ type_ "checkbox"
+    , id_   ref'
+    , name_ ref'
+    ] ++ ifSingleton selected checked_
   where
     ref'     = absoluteRef ref view
     selected = fieldInputBool ref view
