@@ -10,10 +10,12 @@ module Text.Digestive.Lucid.Html5
     , inputPassword
     , inputHidden
     , inputSelect
+    , inputSelectGroup
     , inputRadio
     , inputCheckbox
     , inputFile
     , inputSubmit
+    , inputWithType
     , label
     , form
     , errorList
@@ -38,14 +40,7 @@ ifSingleton True  a = [a]
 
 --------------------------------------------------------------------------------
 inputText :: Monad m => Text -> View v -> HtmlT m ()
-inputText ref view = input_
-    [ type_    "text"
-    , id_      ref'
-    , name_    ref'
-    , value_ $ fieldInputText ref view
-    ]
-  where
-    ref' = absoluteRef ref view
+inputText = inputWithType "text" []
 
 
 --------------------------------------------------------------------------------
@@ -70,26 +65,12 @@ inputTextArea r c ref view = textarea_
 
 --------------------------------------------------------------------------------
 inputPassword :: Monad m => Text -> View v -> HtmlT m ()
-inputPassword ref view = input_
-    [ type_    "password"
-    , id_      ref'
-    , name_    ref'
-    , value_ $ fieldInputText ref view
-    ]
-  where
-    ref' = absoluteRef ref view
+inputPassword = inputWithType "password" []
 
 
 --------------------------------------------------------------------------------
 inputHidden :: Monad m => Text -> View v -> HtmlT m ()
-inputHidden ref view = input_
-    [ type_    "hidden"
-    , id_      ref'
-    , name_    ref'
-    , value_ $ fieldInputText ref view
-    ]
-  where
-    ref' = absoluteRef ref view
+inputHidden = inputWithType "hidden" []
 
 
 --------------------------------------------------------------------------------
@@ -103,6 +84,45 @@ inputSelect ref view = select_
     ref'    = absoluteRef ref view
     value i = ref' `mappend` "." `mappend` i
     choices = fieldInputChoice ref view
+
+
+-------------------------------------------------------------------------------
+-- | Creates a grouped select field using optgroup
+inputSelectGroup :: Monad m => Text -> View (Lucid.HtmlT m ()) -> HtmlT m ()
+inputSelectGroup ref view = Lucid.select_
+    [ id_   ref'
+    , name_ ref'
+    ] $ forM_ choices $ \(groupName, subChoices) -> optgroup_ [label_ groupName] $
+          forM_ subChoices $ \(i, c, sel) -> option_
+          (value_ (value i) : ifSingleton sel (selected_ "selected")) c
+  where
+    ref'    = absoluteRef ref view
+    value i = ref' `mappend` "." `mappend` i
+    choices = fieldInputChoiceGroup ref view
+
+
+-------------------------------------------------------------------------------
+-- | More generic textual input field to support newer input types
+-- like range, date, email, etc.
+inputWithType
+    :: Monad m
+    => Text
+    -- ^ Type
+    -> [Attribute]
+    -- ^ Additional attributes
+    -> Text
+    -> View v
+    -> HtmlT m ()
+inputWithType ty additionalAttrs ref view = input_ attrs
+  where
+    ref' = absoluteRef ref view
+    attrs = defAttrs `mappend` additionalAttrs
+    defAttrs =
+      [ type_ ty
+      , id_ ref'
+      , name_ ref'
+      , value_ $ fieldInputText ref view
+      ]
 
 
 --------------------------------------------------------------------------------
